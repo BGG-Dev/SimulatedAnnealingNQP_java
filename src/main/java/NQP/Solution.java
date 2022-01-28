@@ -1,14 +1,21 @@
 package NQP;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-final class Solution {
+public final class Solution {
     // Chess figures positions
     private final int[] coordinates;
 
     // Energy
     private final int energy;
+
+    // Static random object to make better random generation
+    private static final Random random = new Random();
 
     /*
      * Default constructor
@@ -23,7 +30,11 @@ final class Solution {
      */
     Solution(int dimension) {
         // Generating random coordinates
-        this.coordinates = new Random().ints(dimension, 0, dimension - 1).toArray();
+        List<Integer> source = IntStream.range(0, dimension)
+                .boxed()
+                .collect(Collectors.toList());
+        Collections.shuffle(source);
+        this.coordinates = source.stream().mapToInt(i -> i).toArray();
 
         // Calculating energy
         this.energy = this.calculateEnergy();
@@ -58,32 +69,22 @@ final class Solution {
     }
 
     /*
-     * Dimension getter
-     */
-    public int getDimension() {
-        return this.coordinates.length;
-    }
-
-    /*
      * Overriding inherited toString()
      * from object
      */
     @Override
     public String toString() {
-        // Filling chess field with zeroes
-        char[][] field = new char[this.coordinates.length][this.coordinates.length];
-        for (int i = 0; i < this.coordinates.length; i++) {
-            for (int j = 0; j < this.coordinates.length; j++) {
-                field[i][j] = '0';
-            }
-        }
-
-        // Placing 1 on queens positions and building final string
+        // Appending energy
         StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Energy: ").append(this.energy).append('\n');
+
+        // Appending coordinates
         for (int i = 0; i < this.coordinates.length; i++) {
-            field[i][this.coordinates[i]] = '1';
-            stringBuilder.append(field[i]);
-            stringBuilder.append('\n');
+            stringBuilder.append("Coord #")
+                    .append(i)
+                    .append(": ")
+                    .append(this.coordinates[i])
+                    .append('\n');
         }
 
         // returning result
@@ -96,10 +97,9 @@ final class Solution {
     private void mutate() {
         // Generating indexes to swap
         int p1, p2;
-        Random R = new Random();
-        p1 = R.nextInt(this.coordinates.length);
+        p1 = random.nextInt(this.coordinates.length);
         do {
-            p2 = R.nextInt(this.coordinates.length);
+            p2 = random.nextInt(this.coordinates.length);
         } while (p1 == p2);
 
         // Swapping
@@ -116,7 +116,7 @@ final class Solution {
         int conflictCount = 0;
 
         // Counting conflicts
-        for (int i = 0; i < coordinates.length; i++) {
+        for (int i = 0; i < coordinates.length - 1; i++) {
             for (int j = i + 1; j < coordinates.length; j++) {
                 // Horizontal
                 if (coordinates[i] == coordinates[j]) {
