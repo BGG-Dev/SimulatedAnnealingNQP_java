@@ -28,6 +28,7 @@ public class NQP {
         // Initializing best with random
         this.best = new Solution(this.DIMENSION);
 
+        // New random object for barrier calculation
         Random r = new Random();
 
         // Main cycle
