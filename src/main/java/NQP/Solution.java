@@ -3,7 +3,7 @@ package NQP;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -13,9 +13,6 @@ public final class Solution {
 
     // Energy
     private final int energy;
-
-    // Static random object to make better random generation
-    private static final Random random = new Random();
 
     /*
      * Default constructor
@@ -33,7 +30,7 @@ public final class Solution {
         List<Integer> source = IntStream.range(0, dimension)
                 .boxed()
                 .collect(Collectors.toList());
-        Collections.shuffle(source);
+        Collections.shuffle(source, ThreadLocalRandom.current());
         this.coordinates = source.stream().mapToInt(i -> i).toArray();
 
         // Calculating energy
@@ -74,18 +71,20 @@ public final class Solution {
      */
     @Override
     public String toString() {
-        // Appending energy
+        // Creating new string builder
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Energy: ").append(this.energy).append('\n');
 
         // Appending coordinates
-        for (int i = 0; i < this.coordinates.length; i++) {
+        /*for (int i = 0; i < this.coordinates.length; i++) {
             stringBuilder.append("Coord #")
                     .append(i)
                     .append(": ")
                     .append(this.coordinates[i])
                     .append('\n');
-        }
+        }*/
+
+        // Appending energy
+        stringBuilder.append("Energy: ").append(this.energy).append('\n');
 
         // returning result
         return stringBuilder.toString();
@@ -97,9 +96,9 @@ public final class Solution {
     private void mutate() {
         // Generating indexes to swap
         int p1, p2;
-        p1 = random.nextInt(this.coordinates.length);
+        p1 = ThreadLocalRandom.current().nextInt(this.coordinates.length);
         do {
-            p2 = random.nextInt(this.coordinates.length);
+            p2 = ThreadLocalRandom.current().nextInt(this.coordinates.length);
         } while (p1 == p2);
 
         // Swapping
