@@ -3,6 +3,7 @@ package NQP;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -44,7 +45,7 @@ public class RandomGenerationTest {
                 .boxed()
                 .collect(Collectors.toList());
         for (int i = 0; i < 100; i++) {
-            Collections.shuffle(source);
+            Collections.shuffle(source, ThreadLocalRandom.current());
             for (int j = 0; j < DIMENSION; j++) {
                 System.out.print(source.get(j));
                 System.out.print(' ');

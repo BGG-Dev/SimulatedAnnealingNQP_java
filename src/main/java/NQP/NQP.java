@@ -1,14 +1,14 @@
 package NQP;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
-public class NQP {
+public class NQP implements Runnable {
     // Problem dimension
     private final int DIMENSION;
 
     // Solutions
-    private Solution best;
-    private Solution current;
+    private Solution best = null;
+    private Solution current = null;
 
     // Temperature controller
     private final ATemperatureController temperatureController;
@@ -22,14 +22,18 @@ public class NQP {
     }
 
     /*
+     * Best solution getter
+     */
+    public synchronized Solution getBest() {
+        return this.best;
+    }
+
+    /*
      * Main algorithm implementation
      */
-    public Solution solve() {
+    public synchronized void run() {
         // Initializing best with random
         this.best = new Solution(this.DIMENSION);
-
-        // New random object for barrier calculation
-        Random r = new Random();
 
         // Main cycle
         while (this.best.getEnergy() != 0 &&
@@ -48,7 +52,7 @@ public class NQP {
                 double barrier = Math.pow(Math.E, -1.0 * delta / this.temperatureController.current);
 
                 // Generating chance of jump
-                double chance = r.nextDouble();
+                double chance = ThreadLocalRandom.current().nextDouble();
 
                 // Making final decision
                 if (chance < barrier) {
@@ -59,8 +63,5 @@ public class NQP {
             // Updating temperature
             this.temperatureController.update();
         }
-
-        // Returning result
-        return this.best;
     }
 }
